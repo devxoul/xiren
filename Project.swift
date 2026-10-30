@@ -44,7 +44,8 @@ let project = Project(
         "UISupportedInterfaceOrientations": ["UIInterfaceOrientationPortrait"],
         "ITSAppUsesNonExemptEncryption": false,
       ]) { $1 }),
-      sources: ["iOS/App/**"]
+      sources: ["iOS/App/**"],
+      resources: ["iOS/Resources/**"]
     ),
     .target(
       name: "XireniOSTests",
