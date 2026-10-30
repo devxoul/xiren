@@ -6,3 +6,6 @@ DerivedData/
 build/
 xcuserdata/
 .omo/
+fastlane/.env*
+fastlane/report.xml
+fastlane/README.md

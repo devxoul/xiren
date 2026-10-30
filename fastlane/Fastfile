@@ -1,0 +1,109 @@
+ROOT = File.expand_path("..", __dir__)
+TEAM_ID = "N2C267LBVY"
+WORKSPACE = "Xiren.xcworkspace"
+PROJECT = "Xiren.xcodeproj"
+OUTPUT_DIR = File.join(ROOT, "build/fastlane")
+RELEASE_NOTES = File.join(__dir__, "release_notes.txt")
+MATCH_GIT_URL = "https://github.com/devxoul/xiren-match.git"
+
+APP_ID = "app.xiren.ios"
+
+EXTERNAL_TESTER_GROUP = "Beta Testers"
+BETA_APP_DESCRIPTION = <<~TEXT.strip
+  Xiren opens the 공동현관 doors of an ezVille (S&D 스마트홈) apartment in one tap.
+
+  To test, sign in with the ezVille account for your apartment, pick your doors in Settings, then tap one. Dry Run is on by default, so a request is only described until you turn it off.
+TEXT
+
+# Beta App Review contact. The email is also the testers' feedback address.
+BETA_CONTACT = {
+  contact_first_name: "Suyeol",
+  contact_last_name: "Jeon",
+  contact_email: "devxoul@gmail.com",
+  contact_phone: ENV["APP_REVIEW_PHONE_NUMBER"].to_s.empty? ? nil : ENV["APP_REVIEW_PHONE_NUMBER"],
+  # ezVille accounts are issued to the residents of one apartment complex, so there's no demo account to share.
+  demo_account_required: false,
+  notes: <<~TEXT.strip
+    Xiren talks to the ezVille (S&D 스마트홈) home network. Its accounts are issued to the residents of a specific apartment complex and can't be shared, so no demo account is provided.
+
+    Without an account the app shows its sign-in screen, which is the expected first screen. Dry Run is also on by default, so even a signed-in tester only sees the request that would be sent; no door is opened.
+  TEXT
+}.compact
+
+VERSION_PATTERN = /("CFBundleShortVersionString": ")([^"]+)(")/
+
+before_all do
+  # Temporary keychain + readonly match on CI runners.
+  setup_ci if is_ci
+end
+
+desc "Set the marketing version in Project.swift and commit it"
+lane :bump do |options|
+  version = options[:version].to_s
+  UI.user_error!("Usage: fastlane bump version:X.Y.Z") unless version.match?(/\A\d+\.\d+\.\d+\z/)
+
+  path = File.join(ROOT, "Project.swift")
+  content = File.read(path)
+  UI.user_error!("Couldn't find CFBundleShortVersionString in Project.swift") unless content.match?(VERSION_PATTERN)
+  if current_version == version
+    UI.important("Project.swift is already at #{version}, nothing to commit")
+    next
+  end
+
+  File.write(path, content.sub(VERSION_PATTERN, "\\1#{version}\\3"))
+  git_commit(path: path, message: "Bump version to #{version}")
+end
+
+platform :ios do
+  desc "Build the iPhone app and upload it to TestFlight"
+  lane :beta do
+    build_ios(app_store_connect_api_key)
+  end
+end
+
+def current_version
+  File.read(File.join(ROOT, "Project.swift"))[VERSION_PATTERN, 2]
+end
+
+def build_ios(api_key)
+  # Taken from TestFlight so it always increases; the build number isn't committed.
+  build_number = latest_testflight_build_number(api_key: api_key, app_identifier: APP_ID, initial_build_number: 0) + 1
+  ENV["TUIST_BUILD_NUMBER"] = build_number.to_s
+  sh("cd #{ROOT.shellescape} && tuist generate --no-open")
+
+  match(type: "appstore", platform: "ios", git_url: MATCH_GIT_URL, app_identifier: [APP_ID], api_key: api_key)
+  update_code_signing_settings(
+    path: PROJECT,
+    targets: ["XireniOS"],
+    use_automatic_signing: false,
+    team_id: TEAM_ID,
+    sdk: "iphoneos*",
+    code_sign_identity: "Apple Distribution",
+    profile_name: lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING][APP_ID]
+  )
+
+  build_app(
+    workspace: WORKSPACE,
+    scheme: "XireniOS",
+    configuration: "Production",
+    export_method: "app-store",
+    output_directory: OUTPUT_DIR
+  )
+
+  changelog = File.exist?(RELEASE_NOTES) ? File.read(RELEASE_NOTES).strip : ""
+  upload_to_testflight(
+    api_key: api_key,
+    changelog: changelog.empty? ? nil : changelog,
+    # Beta App Review rejects external submissions without test information and a contact.
+    # Keyed by locale rather than beta_app_description: pilot only patches existing localizations with the latter,
+    # and creates one only for a locale named here, so the first external submission doesn't fail as "missing".
+    localized_app_info: {
+      "en-US" => { description: BETA_APP_DESCRIPTION, feedback_email: BETA_CONTACT[:contact_email] }
+    },
+    beta_app_review_info: BETA_CONTACT,
+    # External groups need a processed build, so wait for it and submit it for beta review.
+    distribute_external: true,
+    groups: [EXTERNAL_TESTER_GROUP],
+    notify_external_testers: true
+  )
+end
