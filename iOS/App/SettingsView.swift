@@ -24,7 +24,7 @@ struct SettingsView: View {
           ForEach(model.customDoors) { door in
             VStack(alignment: .leading) {
               Text(door.name)
-              Text("\(door.dong)동 \(door.ho)").font(.caption).foregroundStyle(.secondary)
+              Text("Building \(door.dong), \(door.ho)").font(.caption).foregroundStyle(.secondary)
             }
           }
           .onDelete { offsets in
@@ -34,7 +34,7 @@ struct SettingsView: View {
         } header: {
           Text("Other Entrances")
         } footer: {
-          Text("Add a 공동현관 the panel doesn't list, such as another 동's. The server may refuse doors outside your own 동.")
+          Text("Add an entrance the panel doesn't list, such as one in another building. The server may refuse doors outside your own building.")
         }
 
         Section {
@@ -77,14 +77,14 @@ private struct AddDoorView: View {
     NavigationStack {
       Form {
         Section {
-          TextField("동 (e.g. 101)", text: $dong).keyboardType(.numberPad)
+          TextField("Building (e.g. 101)", text: $dong).keyboardType(.numberPad)
           TextField("Entrance code (e.g. 9001)", text: $ho).keyboardType(.numberPad)
           TextField("Name (optional)", text: $name)
         } footer: {
           if let error {
             Text(error).foregroundStyle(.red)
           } else {
-            Text("Entrance codes are in the 9000 range: 90x1 for lines 1~2, 90x3 for lines 3~4, with x = 0 for the lobby, 1 for B1 and 2 for B2 in 102동. Other 동s may differ.")
+            Text("Entrance codes are in the 9000 range: 90x1 for lines 1~2, 90x3 for lines 3~4, with x = 0 for the lobby, 1 for B1 and 2 for B2 in building 102. Other buildings may differ.")
           }
         }
       }
@@ -95,7 +95,7 @@ private struct AddDoorView: View {
         ToolbarItem(placement: .confirmationAction) {
           Button("Add") {
             guard let door else { return }
-            if model.addCustomDoor(door) { dismiss() } else { error = "This entrance is already in the list." }
+            if model.addCustomDoor(door) { dismiss() } else { error = String(localized: "This entrance is already in the list.") }
           }
           .disabled(door == nil)
         }

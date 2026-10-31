@@ -58,7 +58,7 @@ actor EzvilleClient {
       throw EzvilleError.unexpectedResponse
     }
     guard EzvilleParser.isTruthy(json["result"]) else {
-      throw EzvilleError.loginFailed(json["msg"] as? String ?? "Login failed.")
+      throw EzvilleError.loginFailed(json["msg"] as? String ?? String(localized: "Login failed."))
     }
     loggedIn = true
   }
@@ -80,7 +80,7 @@ actor EzvilleClient {
     let path = "/app/ctrl/openDoor.ifttt"
     let query = [("mode", "1"), ("dong", door.dong), ("ho", door.ho)]
     if dryRun {
-      return "Dry run: GET \(makeURL(path, query: query).relativePath)?\(Self.encode(query))"
+      return String(localized: "Dry run: GET \(makeURL(path, query: query).relativePath)?\(Self.encode(query))")
     }
     return try await control(path, query: query)
   }
@@ -98,7 +98,7 @@ actor EzvilleClient {
     loggedIn = false
     clearCookies()
     _ = try await get(Self.findPasswordPath)
-    try await expectResetCode(path, query, fallback: "Couldn't send a code. Check the 동, 호 and email.")
+    try await expectResetCode(path, query, fallback: String(localized: "Couldn't send a code. Check the building, unit and email."))
     return nil
   }
 
@@ -106,7 +106,7 @@ actor EzvilleClient {
     let path = "/app/mypage/myPage_FindPassword_checkAuthNum.ifttt"
     let query = form.query()
     if dryRun { return Self.describe(path, query) }
-    try await expectResetCode(path, query, fallback: "Wrong or expired code.")
+    try await expectResetCode(path, query, fallback: String(localized: "Wrong or expired code."))
     return nil
   }
 
@@ -123,7 +123,7 @@ actor EzvilleClient {
     guard let result = EzvilleParser.passwordSaveResult(try await get(path, query: query)) else {
       throw EzvilleError.unexpectedResponse
     }
-    guard result.ok else { throw EzvilleError.server(result.message ?? "Couldn't change the password.") }
+    guard result.ok else { throw EzvilleError.server(result.message ?? String(localized: "Couldn't change the password.")) }
     return nil
   }
 
@@ -136,7 +136,7 @@ actor EzvilleClient {
 
   private static func describe(_ path: String, _ query: [(String, String)]) -> String {
     let masked = query.map { key, value in (key, key.hasPrefix("new_pwd") ? "***" : value) }
-    return "Dry run: GET \(path)?\(encode(masked))"
+    return String(localized: "Dry run: GET \(path)?\(encode(masked))")
   }
 
   private func control(_ path: String, query: [(String, String)]) async throws -> String {
@@ -144,8 +144,8 @@ actor EzvilleClient {
       try await ensureLoggedIn()
       let data = try await get(path, query: query)
       if let result = EzvilleParser.controlResult(data) {
-        guard result.ok else { throw EzvilleError.server(result.message ?? "Request failed.") }
-        return result.message ?? "Done"
+        guard result.ok else { throw EzvilleError.server(result.message ?? String(localized: "Request failed.")) }
+        return result.message ?? String(localized: "Done")
       }
       loggedIn = false // non-JSON body means the session expired
     }

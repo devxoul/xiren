@@ -32,7 +32,7 @@ struct DoorsView: View {
             ContentUnavailableView {
               Label("No Entrances", systemImage: "door.left.hand.closed")
             } description: {
-              Text("Pull to load entrances from the 공동현관 panel.")
+              Text("Pull to load entrances from the lobby door panel.")
             } actions: {
               Button("Load") { Task { await model.refreshDoors() } }
                 .disabled(model.isRefreshing)
@@ -42,7 +42,7 @@ struct DoorsView: View {
         .padding()
       }
       .background(Color(.systemGroupedBackground))
-      .navigationTitle("공동현관")
+      .navigationTitle("Entrances")
       .refreshable { await model.refreshDoors() }
       .toolbar {
         ToolbarItem(placement: .topBarTrailing) {
@@ -109,8 +109,8 @@ struct DoorButton: View {
 
   private var statusText: String {
     switch state {
-    case .idle: "Tap to open"
-    case .opening: "Opening..."
+    case .idle: String(localized: "Tap to open")
+    case .opening: String(localized: "Opening...")
     case .success(let msg): msg
     case .failure(let msg): msg
     }

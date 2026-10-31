@@ -205,14 +205,14 @@ enum EzvilleError: LocalizedError {
 
   var errorDescription: String? {
     switch self {
-    case .missingCredentials: "Not signed in."
-    case .checkstringNotFound: "Login page changed (checkstring not found)."
-    case .passwordTooLong: "Password is longer than the login checkstring."
+    case .missingCredentials: String(localized: "Not signed in.")
+    case .checkstringNotFound: String(localized: "Login page changed (checkstring not found).")
+    case .passwordTooLong: String(localized: "Password is longer than the login checkstring.")
     case .loginFailed(let msg): msg
-    case .http(let code): "Server error (HTTP \(code))."
-    case .invalidDoor: "Not a lobby door code."
+    case .http(let code): String(localized: "Server error (HTTP \(code)).")
+    case .invalidDoor: String(localized: "Not a lobby door code.")
     case .server(let msg): msg
-    case .unexpectedResponse: "Unexpected response from server."
+    case .unexpectedResponse: String(localized: "Unexpected response from server.")
     }
   }
 }
