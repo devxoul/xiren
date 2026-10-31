@@ -1,0 +1,16 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "Open an entrance with ${applicationName}": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "${applicationName}에서 출입문 열어 줘"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

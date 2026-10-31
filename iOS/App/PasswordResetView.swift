@@ -98,9 +98,9 @@ struct PasswordResetView: View {
 
   private var actionTitle: String {
     switch step {
-    case .request: "Send Code to Wall Pad"
-    case .verify: "Verify Code"
-    case .newPassword: "Set Password"
+    case .request: String(localized: "Send Code to Wall Pad")
+    case .verify: String(localized: "Verify Code")
+    case .newPassword: String(localized: "Set Password")
     }
   }
 
@@ -126,11 +126,11 @@ struct PasswordResetView: View {
         step = .newPassword
       case .newPassword:
         guard form.newPassword == confirmation else {
-          error = "The passwords don't match."
+          error = String(localized: "The passwords don't match.")
           return
         }
         guard EzvilleParser.isAcceptedNewPassword(form.newPassword) else {
-          error = "The password doesn't meet the rules below."
+          error = String(localized: "The password doesn't meet the rules below.")
           return
         }
         note = try await model.resetPassword(form)

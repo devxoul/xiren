@@ -108,7 +108,7 @@ final class AppModel {
     do {
       let fetched = try await client.fetchDoors()
       guard !fetched.isEmpty else {
-        errorMessage = "No entrances found on the 공동현관 panel."
+        errorMessage = String(localized: "No entrances found on the lobby door panel.")
         return
       }
       panelDoors = fetched

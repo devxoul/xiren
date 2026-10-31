@@ -1,0 +1,636 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "8-20 characters using 3 of uppercase, lowercase, digits and symbols, or 10+ characters using 2 of them.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "영문 대문자, 소문자, 숫자, 특수문자 중 3종류 이상을 쓰면 8~20자, 2종류를 쓰면 10~20자입니다."
+          }
+        }
+      }
+    },
+    "A verification code will appear on your home's wall pad.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "집 월패드에 인증번호가 표시됩니다."
+          }
+        }
+      }
+    },
+    "Account": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "계정"
+          }
+        }
+      }
+    },
+    "Add": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "추가"
+          }
+        }
+      }
+    },
+    "Add Entrance": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "출입문 추가"
+          }
+        }
+      }
+    },
+    "Add an entrance the panel doesn't list, such as one in another building. The server may refuse doors outside your own building.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다른 동의 공동현관처럼 목록에 없는 출입문을 추가합니다. 우리 동이 아닌 출입문은 서버가 거부할 수 있습니다."
+          }
+        }
+      }
+    },
+    "Building %@, %@": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@동 %2$@"
+          }
+        }
+      }
+    },
+    "Building (e.g. 101)": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "동 (예: 101)"
+          }
+        }
+      }
+    },
+    "Building (동)": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "동"
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "취소"
+          }
+        }
+      }
+    },
+    "Code from Wall Pad": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "월패드 인증번호"
+          }
+        }
+      }
+    },
+    "Confirm New Password": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "새 비밀번호 확인"
+          }
+        }
+      }
+    },
+    "Couldn't change the password.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "비밀번호를 변경하지 못했습니다."
+          }
+        }
+      }
+    },
+    "Couldn't send a code. Check the building, unit and email.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "인증번호를 보내지 못했습니다. 동, 호, 이메일을 확인하세요."
+          }
+        }
+      }
+    },
+    "Done": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "완료"
+          }
+        }
+      }
+    },
+    "Dry Run": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "테스트 모드"
+          }
+        }
+      }
+    },
+    "Dry run: GET %@?%@": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "테스트 모드: GET %1$@?%2$@"
+          }
+        }
+      }
+    },
+    "Dry run: doors will not actually open": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "테스트 모드: 문이 실제로 열리지 않습니다"
+          }
+        }
+      }
+    },
+    "Email": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이메일"
+          }
+        }
+      }
+    },
+    "Entrance": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "출입문"
+          }
+        }
+      }
+    },
+    "Entrance code (e.g. 9001)": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "출입문 코드 (예: 9001)"
+          }
+        }
+      }
+    },
+    "Entrance codes are in the 9000 range: 90x1 for lines 1~2, 90x3 for lines 3~4, with x = 0 for the lobby, 1 for B1 and 2 for B2 in building 102. Other buildings may differ.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "출입문 코드는 9000번대입니다. 102동 기준으로 1~2라인은 90x1, 3~4라인은 90x3이며, x는 로비층 0, 지하 1층 1, 지하 2층 2입니다. 다른 동은 다를 수 있습니다."
+          }
+        }
+      }
+    },
+    "Entrances": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "공동현관"
+          }
+        }
+      }
+    },
+    "Error": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오류"
+          }
+        }
+      }
+    },
+    "Load": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "불러오기"
+          }
+        }
+      }
+    },
+    "Login failed.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "로그인에 실패했습니다."
+          }
+        }
+      }
+    },
+    "Login page changed (checkstring not found).": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "로그인 페이지가 바뀌었습니다(checkstring 없음)."
+          }
+        }
+      }
+    },
+    "Name (optional)": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이름 (선택)"
+          }
+        }
+      }
+    },
+    "New Password": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "새 비밀번호"
+          }
+        }
+      }
+    },
+    "No Entrances": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "출입문 없음"
+          }
+        }
+      }
+    },
+    "No entrances found on the lobby door panel.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "공동현관 패널에서 출입문을 찾지 못했습니다."
+          }
+        }
+      }
+    },
+    "Not a lobby door code.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "공동현관 출입문 코드가 아닙니다."
+          }
+        }
+      }
+    },
+    "Not signed in.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "로그인되어 있지 않습니다."
+          }
+        }
+      }
+    },
+    "OK": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "확인"
+          }
+        }
+      }
+    },
+    "Open Entrance": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "출입문 열기"
+          }
+        }
+      }
+    },
+    "Opening...": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "여는 중..."
+          }
+        }
+      }
+    },
+    "Opens a lobby entrance door.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "공동현관 출입문을 엽니다."
+          }
+        }
+      }
+    },
+    "Other Entrances": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다른 출입문"
+          }
+        }
+      }
+    },
+    "Password": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "비밀번호"
+          }
+        }
+      }
+    },
+    "Password is longer than the login checkstring.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "비밀번호가 로그인 checkstring보다 깁니다."
+          }
+        }
+      }
+    },
+    "Pull to load entrances from the lobby door panel.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아래로 당겨 공동현관 출입문을 불러오세요."
+          }
+        }
+      }
+    },
+    "Reload Entrances": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "출입문 다시 불러오기"
+          }
+        }
+      }
+    },
+    "Request failed.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "요청에 실패했습니다."
+          }
+        }
+      }
+    },
+    "Send Code to Wall Pad": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "월패드로 인증번호 보내기"
+          }
+        }
+      }
+    },
+    "Server error (HTTP %lld).": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "서버 오류(HTTP %lld)."
+          }
+        }
+      }
+    },
+    "Set Password": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "비밀번호 설정"
+          }
+        }
+      }
+    },
+    "Set Password with Wall Pad": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "월패드로 비밀번호 설정"
+          }
+        }
+      }
+    },
+    "Settings": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "설정"
+          }
+        }
+      }
+    },
+    "Sign In": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "로그인"
+          }
+        }
+      }
+    },
+    "Sign Out": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "로그아웃"
+          }
+        }
+      }
+    },
+    "Tap to open": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "탭하여 열기"
+          }
+        }
+      }
+    },
+    "The code expires in 10 minutes.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "인증번호는 10분 뒤 만료됩니다."
+          }
+        }
+      }
+    },
+    "The password doesn't meet the rules below.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "비밀번호가 아래 규칙에 맞지 않습니다."
+          }
+        }
+      }
+    },
+    "The passwords don't match.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "비밀번호가 일치하지 않습니다."
+          }
+        }
+      }
+    },
+    "This entrance is already in the list.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이미 목록에 있는 출입문입니다."
+          }
+        }
+      }
+    },
+    "Unexpected response from server.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "서버 응답을 이해할 수 없습니다."
+          }
+        }
+      }
+    },
+    "Unit (호)": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "호"
+          }
+        }
+      }
+    },
+    "Use the Shortcuts app, Siri, or the Action Button with “Open Entrance” for one-press access.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "단축어 앱, Siri 또는 동작 버튼에 “출입문 열기”를 연결하면 한 번에 열 수 있습니다."
+          }
+        }
+      }
+    },
+    "Verify Code": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "인증번호 확인"
+          }
+        }
+      }
+    },
+    "When on, nothing is sent: each step only shows the request it would make.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "켜 두면 아무것도 보내지 않고, 단계마다 보낼 요청만 보여 줍니다."
+          }
+        }
+      }
+    },
+    "When on, tapping a door only shows the request that would be sent. Turn off to actually open doors.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "켜 두면 문을 탭해도 보낼 요청만 보여 줍니다. 실제로 문을 열려면 끄세요."
+          }
+        }
+      }
+    },
+    "Wrong or expired code.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "인증번호가 틀렸거나 만료되었습니다."
+          }
+        }
+      }
+    },
+    "Your ezVille (S&D 스마트홈) account. Stored only in this device's Keychain.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ezVille(S&D 스마트홈) 계정입니다. 이 기기의 키체인에만 저장됩니다."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

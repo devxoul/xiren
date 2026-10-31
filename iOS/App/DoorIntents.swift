@@ -27,7 +27,7 @@ struct DoorQuery: EntityQuery {
 
 struct OpenDoorIntent: AppIntent {
   static let title: LocalizedStringResource = "Open Entrance"
-  static let description = IntentDescription("Opens a 공동현관 entrance door.")
+  static let description = IntentDescription("Opens a lobby entrance door.")
 
   @Parameter(title: "Entrance")
   var door: DoorEntity
