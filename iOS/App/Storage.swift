@@ -51,6 +51,12 @@ enum Preferences {
     set { defaults.set(try? JSONEncoder().encode(newValue), forKey: "customDoors") }
   }
 
+  /// Entrances hidden from the door screen in Settings. They stay available to Shortcuts.
+  static var hiddenDoorIDs: Set<Door.ID> {
+    get { Set(defaults.stringArray(forKey: "hiddenDoorIDs") ?? []) }
+    set { defaults.set(newValue.sorted(), forKey: "hiddenDoorIDs") }
+  }
+
   static var allDoors: [Door] { merging(doors, customDoors) }
 
   /// Panel entrances first, then added ones the panel doesn't already list.
@@ -66,6 +72,6 @@ enum Preferences {
   }
 
   static func reset() {
-    for key in ["doors", "customDoors", "primaryDoorID"] { defaults.removeObject(forKey: key) }
+    for key in ["doors", "customDoors", "hiddenDoorIDs", "primaryDoorID"] { defaults.removeObject(forKey: key) }
   }
 }

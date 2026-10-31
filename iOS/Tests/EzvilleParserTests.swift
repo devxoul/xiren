@@ -104,6 +104,26 @@ struct EzvilleParserTests {
     ])
   }
 
+  @MainActor @Test func hiddenDoorsLeaveDoorScreenButNotShortcuts() {
+    let saved = (Preferences.doors, Preferences.customDoors, Preferences.hiddenDoorIDs)
+    defer { (Preferences.doors, Preferences.customDoors, Preferences.hiddenDoorIDs) = saved }
+    let lobby = Door(dong: "101", ho: "9001", name: "101동 9001")
+    let basement = Door(dong: "101", ho: "9011", name: "101동 9011")
+    Preferences.doors = [lobby, basement]
+    Preferences.customDoors = []
+    Preferences.hiddenDoorIDs = []
+
+    let model = AppModel()
+    model.setHidden(lobby, true)
+    #expect(model.visibleDoors.map(\.id) == ["101-9011"])
+    #expect(Preferences.allDoors.map(\.id) == ["101-9001", "101-9011"])
+    #expect(AppModel().visibleDoors.map(\.id) == ["101-9011"])
+
+    model.setHidden(lobby, false)
+    #expect(model.visibleDoors.map(\.id) == ["101-9001", "101-9011"])
+    #expect(Preferences.hiddenDoorIDs.isEmpty)
+  }
+
   @Test func lobbyDoorCodesAreIn9000Range() {
     #expect(EzvilleParser.isLobbyDoorCode("9023"))
     #expect(!EzvilleParser.isLobbyDoorCode("1501"))
