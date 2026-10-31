@@ -6,6 +6,7 @@ struct LoginView: View {
   @State private var password = ""
   @State private var isSigningIn = false
   @State private var error: String?
+  @State private var isResettingPassword = false
 
   var body: some View {
     NavigationStack {
@@ -38,8 +39,19 @@ struct LoginView: View {
           }
           .disabled(email.isEmpty || password.isEmpty || isSigningIn)
         }
+
+        Section {
+          Button("Set Password with Wall Pad") { isResettingPassword = true }
+        }
       }
       .navigationTitle("Xiren")
+      .sheet(isPresented: $isResettingPassword) {
+        PasswordResetView(email: email) { email, password in
+          self.email = email
+          self.password = password
+          error = nil
+        }
+      }
     }
   }
 

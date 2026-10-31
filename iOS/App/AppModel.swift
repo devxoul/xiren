@@ -44,6 +44,18 @@ final class AppModel {
     await refreshDoors()
   }
 
+  func sendPasswordResetCode(_ form: PasswordResetForm) async throws -> String? {
+    try await client.sendPasswordResetCode(form, dryRun: dryRun)
+  }
+
+  func verifyPasswordResetCode(_ form: PasswordResetForm) async throws -> String? {
+    try await client.verifyPasswordResetCode(form, dryRun: dryRun)
+  }
+
+  func resetPassword(_ form: PasswordResetForm) async throws -> String? {
+    try await client.resetPassword(form, dryRun: dryRun)
+  }
+
   func signOut() async {
     await client.signOut()
     Keychain.deleteCredentials()

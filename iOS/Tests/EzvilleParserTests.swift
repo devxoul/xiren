@@ -40,6 +40,46 @@ struct EzvilleParserTests {
     #expect(EzvilleParser.controlResult(Data("<html>login</html>".utf8)) == nil)
   }
 
+  @Test func inputValueReadsHiddenFields() {
+    let html = #"<input type="hidden" id="seq" name="seq" value="42" /><input type="hidden" id="act" name="act" value="auth">"#
+    #expect(EzvilleParser.inputValue(id: "seq", in: html) == "42")
+    #expect(EzvilleParser.inputValue(id: "act", in: html) == "auth")
+    #expect(EzvilleParser.inputValue(id: "missing", in: html) == nil)
+  }
+
+  @Test func passwordResetQueryMatchesFindPasswordForm() {
+    let form = PasswordResetForm(dong: " 101 ", ho: "1501", email: "user@example.com", code: "123456", newPassword: "Secret123!")
+    #expect(form.query().map(\.0) == ["seq", "act", "hh_dong", "hh_ho", "email", "auth_num", "devicetoken"])
+    #expect(form.query().map(\.1) == ["", "auth", "101", "1501", "user@example.com", "123456", "token"])
+    let save = form.query(includingPassword: true, seq: "7")
+    #expect(save.first! == ("seq", "7"))
+    #expect(save.suffix(2).map(\.0) == ["new_pwd", "new_pwd_check"])
+    #expect(save.suffix(2).allSatisfy { $0.1 == "Secret123!" })
+  }
+
+  @Test func resetCodeResultSucceedsOnlyOnZero() {
+    #expect(EzvilleParser.resetCodeResult(Data(#"{"result":"0"}"#.utf8)) == ControlResult(ok: true, message: nil))
+    #expect(EzvilleParser.resetCodeResult(Data(#"{"result":0}"#.utf8))?.ok == true)
+    #expect(EzvilleParser.resetCodeResult(Data(#"{"result":"1","msg":"인증번호 오류"}"#.utf8)) == ControlResult(ok: false, message: "인증번호 오류"))
+    #expect(EzvilleParser.resetCodeResult(Data("<html></html>".utf8)) == nil)
+  }
+
+  @Test func passwordSaveResultUsesJavaScriptTruthiness() {
+    #expect(EzvilleParser.passwordSaveResult(Data(#"{"result":true}"#.utf8))?.ok == true)
+    #expect(EzvilleParser.passwordSaveResult(Data(#"{"result":"0"}"#.utf8))?.ok == true)
+    #expect(EzvilleParser.passwordSaveResult(Data(#"{"result":false,"msg":"no"}"#.utf8)) == ControlResult(ok: false, message: "no"))
+    #expect(EzvilleParser.passwordSaveResult(Data(#"{"result":""}"#.utf8))?.ok == false)
+  }
+
+  @Test func newPasswordRules() {
+    #expect(EzvilleParser.isAcceptedNewPassword("Abcdef1!"))
+    #expect(EzvilleParser.isAcceptedNewPassword("abcdefgh12"))
+    #expect(!EzvilleParser.isAcceptedNewPassword("abcdefg12"))
+    #expect(!EzvilleParser.isAcceptedNewPassword("Abcde1!"))
+    #expect(!EzvilleParser.isAcceptedNewPassword("abcdefghijklmnop"))
+    #expect(!EzvilleParser.isAcceptedNewPassword("Abcdefghij1!Abcdefghij"))
+  }
+
   @Test func lobbyDoorCodesAreIn9000Range() {
     #expect(EzvilleParser.isLobbyDoorCode("9023"))
     #expect(!EzvilleParser.isLobbyDoorCode("1501"))

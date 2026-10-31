@@ -14,6 +14,26 @@ struct Door: Codable, Hashable, Identifiable, Sendable {
   }
 }
 
+/// Fields of the find-password page's `#theForm`, sent as query parameters by every step.
+struct PasswordResetForm: Sendable {
+  var dong = ""
+  var ho = ""
+  var email = ""
+  var code = ""
+  var newPassword = ""
+
+  func query(includingPassword: Bool = false, seq: String = "", act: String = "auth") -> [(String, String)] {
+    let trim = { (s: String) in s.trimmingCharacters(in: .whitespacesAndNewlines) }
+    // Non-Android clients send the literal "token" (the page's own fallback).
+    var query = [
+      ("seq", seq), ("act", act), ("hh_dong", trim(dong)), ("hh_ho", trim(ho)),
+      ("email", trim(email)), ("auth_num", trim(code)), ("devicetoken", "token"),
+    ]
+    if includingPassword { query += [("new_pwd", newPassword), ("new_pwd_check", newPassword)] }
+    return query
+  }
+}
+
 struct ControlResult: Sendable, Equatable {
   let ok: Bool
   let message: String?
@@ -32,8 +52,50 @@ enum EzvilleParser {
   }
 
   static func checkstring(in html: String) -> String? {
-    firstCapture(#"id\s*=\s*["']checkstring["'][^>]*value\s*=\s*["']([^"']*)["']"#, in: html)
-      ?? firstCapture(#"value\s*=\s*["']([^"']*)["'][^>]*id\s*=\s*["']checkstring["']"#, in: html)
+    inputValue(id: "checkstring", in: html)
+  }
+
+  /// Value of `<input id="…" value="…">`, in either attribute order.
+  static func inputValue(id: String, in html: String) -> String? {
+    let id = NSRegularExpression.escapedPattern(for: id)
+    return firstCapture(#"id\s*=\s*["']"# + id + #"["'][^>]*value\s*=\s*["']([^"']*)["']"#, in: html)
+      ?? firstCapture(#"value\s*=\s*["']([^"']*)["'][^>]*id\s*=\s*["']"# + id + #"["']"#, in: html)
+  }
+
+  /// 영어 대문자/소문자/숫자/특수문자: 2 kinds need 10+ characters, 3+ kinds need 8+, at most 20.
+  static func isAcceptedNewPassword(_ password: String) -> Bool {
+    guard password.count <= 20 else { return false }
+    let kinds = [
+      password.contains { $0.isASCII && $0.isUppercase },
+      password.contains { $0.isASCII && $0.isLowercase },
+      password.contains { $0.isASCII && $0.isNumber },
+      password.contains { !($0.isASCII && ($0.isLetter || $0.isNumber)) },
+    ].filter { $0 }.count
+    return (kinds >= 3 && password.count >= 8) || (kinds == 2 && password.count >= 10)
+  }
+
+  /// `sendAuthNum` / `checkAuthNum` succeed when `result == "0"` (the page's own check).
+  static func resetCodeResult(_ data: Data) -> ControlResult? {
+    guard let json = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
+        let value = json["result"] else { return nil }
+    let ok = switch value {
+    case let s as String: s == "0"
+    case let n as NSNumber: n.intValue == 0
+    default: false
+    }
+    return ControlResult(ok: ok, message: json["msg"] as? String)
+  }
+
+  /// `PWSave` is checked with JS truthiness (`if (res.result)`), so a non-empty string counts.
+  static func passwordSaveResult(_ data: Data) -> ControlResult? {
+    guard let json = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
+        let value = json["result"] else { return nil }
+    let ok = switch value {
+    case let s as String: !s.isEmpty
+    case let n as NSNumber: n.intValue != 0
+    default: false
+    }
+    return ControlResult(ok: ok, message: json["msg"] as? String)
   }
 
   /// 공동현관 entrances are encoded as pseudo unit numbers in the 9000 range (`btnOpen()` guard).
