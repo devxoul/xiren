@@ -104,6 +104,16 @@ enum EzvilleParser {
     return n / 9000 == 1
   }
 
+  /// A manually added entrance, such as another 동's 공동현관. Nil unless 동 is a number and 호 is a
+  /// lobby door code. The name defaults to "<동>동 <호>".
+  static func customDoor(dong: String, ho: String, name: String) -> Door? {
+    let dong = dong.trimmingCharacters(in: .whitespacesAndNewlines)
+    let ho = ho.trimmingCharacters(in: .whitespacesAndNewlines)
+    let name = name.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard Int(dong) != nil, isLobbyDoorCode(ho) else { return nil }
+    return Door(dong: dong, ho: ho, name: name.isEmpty ? "\(dong)동 \(ho)" : name)
+  }
+
   /// Parses `<li onclick="selectDoor(idx, dong, ho, 'lobby')">label</li>` entries from the
   /// `DEVICE_TYPE=로비문열림` panel.
   static func doors(in html: String) -> [Door] {

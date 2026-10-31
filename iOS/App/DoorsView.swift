@@ -19,14 +19,14 @@ struct DoorsView: View {
           }
 
           if let primary = model.primaryDoor {
-            DoorButton(door: primary, state: model.state(for: primary), prominent: true) {
+            DoorButton(title: model.title(for: primary), state: model.state(for: primary), prominent: true) {
               Task { await model.open(primary) }
             }
           }
 
           LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
             ForEach(model.otherDoors) { door in
-              DoorButton(door: door, state: model.state(for: door), prominent: false) {
+              DoorButton(title: model.title(for: door), state: model.state(for: door), prominent: false) {
                 Task { await model.open(door) }
               }
               .contextMenu {
@@ -67,7 +67,7 @@ struct DoorsView: View {
 }
 
 struct DoorButton: View {
-  let door: Door
+  let title: String
   let state: DoorState
   let prominent: Bool
   let action: () -> Void
@@ -83,7 +83,7 @@ struct DoorButton: View {
           }
         }
         Spacer(minLength: 0)
-        Text(door.shortName)
+        Text(title)
           .font(prominent ? .title2.bold() : .headline)
           .multilineTextAlignment(.leading)
           .lineLimit(2)

@@ -80,6 +80,19 @@ struct EzvilleParserTests {
     #expect(!EzvilleParser.isAcceptedNewPassword("Abcdefghij1!Abcdefghij"))
   }
 
+  @Test func customDoorRequiresDongAndLobbyCode() {
+    #expect(EzvilleParser.customDoor(dong: " 101 ", ho: "9001", name: "") == Door(dong: "101", ho: "9001", name: "101동 9001"))
+    #expect(EzvilleParser.customDoor(dong: "101", ho: "9011", name: " 친구네 ")?.name == "친구네")
+    #expect(EzvilleParser.customDoor(dong: "101", ho: "1501", name: "") == nil)
+    #expect(EzvilleParser.customDoor(dong: "", ho: "9001", name: "") == nil)
+  }
+
+  @Test func mergedDoorsKeepPanelFirstAndDropDuplicates() {
+    let panel = [Door(dong: "102", ho: "9001", name: "102동 로비층 1~2라인")]
+    let custom = [Door(dong: "102", ho: "9001", name: "dup"), Door(dong: "101", ho: "9001", name: "101동 9001")]
+    #expect(Preferences.merging(panel, custom).map(\.id) == ["102-9001", "101-9001"])
+  }
+
   @Test func lobbyDoorCodesAreIn9000Range() {
     #expect(EzvilleParser.isLobbyDoorCode("9023"))
     #expect(!EzvilleParser.isLobbyDoorCode("1501"))
