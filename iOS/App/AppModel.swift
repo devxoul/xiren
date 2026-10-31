@@ -16,6 +16,7 @@ final class AppModel {
   private(set) var email: String? = Keychain.loadCredentials()?.email
   private var panelDoors: [Door] = Preferences.doors
   private(set) var customDoors: [Door] = Preferences.customDoors
+  private(set) var hiddenDoorIDs: Set<Door.ID> = Preferences.hiddenDoorIDs
   private(set) var states: [Door.ID: DoorState] = [:]
   private(set) var isRefreshing = false
   var errorMessage: String?
@@ -26,6 +27,18 @@ final class AppModel {
   var isSignedIn: Bool { email != nil }
 
   var doors: [Door] { Preferences.merging(panelDoors, customDoors) }
+
+  /// The doors shown on the door screen.
+  var visibleDoors: [Door] { doors.filter { !hiddenDoorIDs.contains($0.id) } }
+
+  func isHidden(_ door: Door) -> Bool {
+    hiddenDoorIDs.contains(door.id)
+  }
+
+  func setHidden(_ door: Door, _ hidden: Bool) {
+    if hidden { hiddenDoorIDs.insert(door.id) } else { hiddenDoorIDs.remove(door.id) }
+    Preferences.hiddenDoorIDs = hiddenDoorIDs
+  }
 
   /// Panel doors drop the shared 동 prefix; added doors keep their full name, since they're another 동.
   func title(for door: Door) -> String {
@@ -43,6 +56,7 @@ final class AppModel {
   func removeCustomDoor(_ door: Door) {
     customDoors.removeAll { $0.id == door.id }
     Preferences.customDoors = customDoors
+    setHidden(door, false)
   }
 
   func state(for door: Door) -> DoorState {
@@ -75,6 +89,7 @@ final class AppModel {
     email = nil
     panelDoors = []
     customDoors = []
+    hiddenDoorIDs = []
     states = [:]
   }
 

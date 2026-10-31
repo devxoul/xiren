@@ -16,8 +16,18 @@ struct SettingsView: View {
         }
 
         Section {
+          ForEach(model.doors) { door in
+            Toggle(model.title(for: door), isOn: Binding(
+              get: { !model.isHidden(door) },
+              set: { model.setHidden(door, !$0) }
+            ))
+          }
           Button("Reload Entrances") { Task { await model.refreshDoors() } }
             .disabled(model.isRefreshing)
+        } header: {
+          Text("Entrances")
+        } footer: {
+          Text("Turn off an entrance to hide it from the door screen. Hidden entrances still work in Shortcuts.")
         }
 
         Section {

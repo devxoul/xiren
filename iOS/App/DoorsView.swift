@@ -18,7 +18,7 @@ struct DoorsView: View {
               .background(.orange.opacity(0.12), in: .rect(cornerRadius: 12))
           }
 
-          ForEach(Door.floorRows(model.doors), id: \.first?.id) { row in
+          ForEach(Door.floorRows(model.visibleDoors), id: \.first?.id) { row in
             HStack(spacing: 12) {
               ForEach(row) { door in
                 DoorButton(title: model.title(for: door), state: model.state(for: door)) {
@@ -36,6 +36,14 @@ struct DoorsView: View {
             } actions: {
               Button("Load") { Task { await model.refreshDoors() } }
                 .disabled(model.isRefreshing)
+            }
+          } else if model.visibleDoors.isEmpty {
+            ContentUnavailableView {
+              Label("All Entrances Hidden", systemImage: "eye.slash")
+            } description: {
+              Text("Show entrances again in Settings.")
+            } actions: {
+              Button("Settings") { showSettings = true }
             }
           }
         }
