@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['**.md', 'LICENSE', 'fastlane/release_notes.txt']
+  pull_request:
+    branches: [main]
+    paths-ignore: ['**.md', 'LICENSE', 'fastlane/release_notes.txt']
+
+# A new push to a PR supersedes its in-flight run. Pushes to main always finish.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  # Index-while-building only feeds the editor, so skip it on CI.
+  BUILD_FLAGS: CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO COMPILER_INDEX_STORE_ENABLE=NO
+
+jobs:
+  ios:
+    name: iOS (test)
+    runs-on: macos-26
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Installs the Tuist version pinned in mise.toml, keeping CI and local dev in sync.
+      # Not Homebrew: the tuist tap's cask declares `conflicts_with formula:`, a key
+      # Homebrew 6 dropped, which aborts any `tuist` lookup in the tap (tuist/homebrew-tuist#41).
+      - name: Install Tuist
+        uses: jdx/mise-action@c37c93293d6b742fc901e1406b8f764f6fb19dac # v2
+
+      - name: Generate Project
+        run: tuist generate --no-open
+
+      # Simulator names change with each Xcode on the runner image, so pick any available iPhone.
+      - name: Pick Simulator
+        run: |
+          udid=$(xcrun simctl list devices available iPhone --json | jq -r '[.devices[][]] | first | .udid')
+          echo "DESTINATION=platform=iOS Simulator,id=$udid" >> "$GITHUB_ENV"
+
+      - name: Test
+        run: |
+          xcodebuild test \
+            -workspace Xiren.xcworkspace \
+            -scheme XireniOS \
+            -configuration Debug \
+            -destination "$DESTINATION" \
+            $BUILD_FLAGS
