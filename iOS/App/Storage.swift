@@ -45,6 +45,20 @@ enum Preferences {
     set { defaults.set(try? JSONEncoder().encode(newValue), forKey: "doors") }
   }
 
+  /// Entrances added by hand (other 동s). Kept apart from `doors` so reloading the panel keeps them.
+  static var customDoors: [Door] {
+    get { defaults.data(forKey: "customDoors").flatMap { try? JSONDecoder().decode([Door].self, from: $0) } ?? [] }
+    set { defaults.set(try? JSONEncoder().encode(newValue), forKey: "customDoors") }
+  }
+
+  static var allDoors: [Door] { merging(doors, customDoors) }
+
+  /// Panel entrances first, then added ones the panel doesn't already list.
+  static func merging(_ panel: [Door], _ custom: [Door]) -> [Door] {
+    let ids = Set(panel.map(\.id))
+    return panel + custom.filter { !ids.contains($0.id) }
+  }
+
   static var primaryDoorID: String? {
     get { defaults.string(forKey: "primaryDoorID") }
     set { defaults.set(newValue, forKey: "primaryDoorID") }
@@ -57,6 +71,6 @@ enum Preferences {
   }
 
   static func reset() {
-    for key in ["doors", "primaryDoorID"] { defaults.removeObject(forKey: key) }
+    for key in ["doors", "customDoors", "primaryDoorID"] { defaults.removeObject(forKey: key) }
   }
 }

@@ -17,11 +17,11 @@ struct DoorEntity: AppEntity {
 
 struct DoorQuery: EntityQuery {
   func entities(for identifiers: [DoorEntity.ID]) async throws -> [DoorEntity] {
-    Preferences.doors.filter { identifiers.contains($0.id) }.map(DoorEntity.init)
+    Preferences.allDoors.filter { identifiers.contains($0.id) }.map(DoorEntity.init)
   }
 
   func suggestedEntities() async throws -> [DoorEntity] {
-    Preferences.doors.map(DoorEntity.init)
+    Preferences.allDoors.map(DoorEntity.init)
   }
 }
 
@@ -33,7 +33,7 @@ struct OpenDoorIntent: AppIntent {
   var door: DoorEntity
 
   func perform() async throws -> some IntentResult & ProvidesDialog {
-    guard let target = Preferences.doors.first(where: { $0.id == door.id }) else { throw EzvilleError.invalidDoor }
+    guard let target = Preferences.allDoors.first(where: { $0.id == door.id }) else { throw EzvilleError.invalidDoor }
     let message = try await EzvilleClient.shared.openDoor(target, dryRun: Preferences.dryRun)
     return .result(dialog: "\(message)")
   }
@@ -44,7 +44,7 @@ struct OpenPrimaryDoorIntent: AppIntent {
   static let description = IntentDescription("Opens your primary 공동현관 entrance.")
 
   func perform() async throws -> some IntentResult & ProvidesDialog {
-    let doors = Preferences.doors
+    let doors = Preferences.allDoors
     guard let target = doors.first(where: { $0.id == Preferences.primaryDoorID }) ?? doors.first else {
       throw EzvilleError.invalidDoor
     }

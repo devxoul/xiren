@@ -14,7 +14,8 @@ final class AppModel {
   private let client = EzvilleClient.shared
 
   private(set) var email: String? = Keychain.loadCredentials()?.email
-  private(set) var doors: [Door] = Preferences.doors
+  private var panelDoors: [Door] = Preferences.doors
+  private(set) var customDoors: [Door] = Preferences.customDoors
   private(set) var primaryDoorID: String? = Preferences.primaryDoorID
   private(set) var states: [Door.ID: DoorState] = [:]
   private(set) var isRefreshing = false
@@ -24,6 +25,26 @@ final class AppModel {
   }
 
   var isSignedIn: Bool { email != nil }
+
+  var doors: [Door] { Preferences.merging(panelDoors, customDoors) }
+
+  /// Panel doors drop the shared 동 prefix; added doors keep their full name, since they're another 동.
+  func title(for door: Door) -> String {
+    customDoors.contains { $0.id == door.id } ? door.name : door.shortName
+  }
+
+  /// Adds an entrance the panel doesn't list. Returns false if it's already in the list.
+  func addCustomDoor(_ door: Door) -> Bool {
+    guard !doors.contains(where: { $0.id == door.id }) else { return false }
+    customDoors.append(door)
+    Preferences.customDoors = customDoors
+    return true
+  }
+
+  func removeCustomDoor(_ door: Door) {
+    customDoors.removeAll { $0.id == door.id }
+    Preferences.customDoors = customDoors
+  }
 
   var primaryDoor: Door? {
     doors.first { $0.id == primaryDoorID } ?? doors.first
@@ -61,7 +82,8 @@ final class AppModel {
     Keychain.deleteCredentials()
     Preferences.reset()
     email = nil
-    doors = []
+    panelDoors = []
+    customDoors = []
     primaryDoorID = nil
     states = [:]
   }
@@ -70,7 +92,7 @@ final class AppModel {
     guard isSignedIn else { return }
     try? await client.ensureLoggedIn()
     if let fetched = try? await client.fetchDoors(), !fetched.isEmpty {
-      doors = fetched
+      panelDoors = fetched
       Preferences.doors = fetched
     }
   }
@@ -84,7 +106,7 @@ final class AppModel {
         errorMessage = "No entrances found on the 공동현관 panel."
         return
       }
-      doors = fetched
+      panelDoors = fetched
       Preferences.doors = fetched
     } catch {
       errorMessage = error.localizedDescription
