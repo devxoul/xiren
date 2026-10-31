@@ -93,6 +93,17 @@ struct EzvilleParserTests {
     #expect(Preferences.merging(panel, custom).map(\.id) == ["102-9001", "101-9001"])
   }
 
+  @Test func floorRowsGroupByDongThenFloor() {
+    let door = { (dong: String, ho: String) in Door(dong: dong, ho: ho, name: "") }
+    let doors = [door("102", "9013"), door("102", "9001"), door("102", "9021"), door("101", "9001"), door("102", "9011"), door("102", "9003")]
+    #expect(Door.floorRows(doors).map { $0.map(\.id) } == [
+      ["102-9001", "102-9003"],
+      ["102-9011", "102-9013"],
+      ["102-9021"],
+      ["101-9001"],
+    ])
+  }
+
   @Test func lobbyDoorCodesAreIn9000Range() {
     #expect(EzvilleParser.isLobbyDoorCode("9023"))
     #expect(!EzvilleParser.isLobbyDoorCode("1501"))

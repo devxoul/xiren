@@ -7,6 +7,20 @@ struct Door: Codable, Hashable, Identifiable, Sendable {
 
   var id: String { "\(dong)-\(ho)" }
 
+  /// Third digit of the 90FL code: 0 = 로비층, 1 = 지하 1층, 2 = 지하 2층 (as seen in 102동).
+  var floor: Int { ((Int(ho) ?? 9000) - 9000) / 10 }
+
+  /// Rows of doors sharing a 동 and floor, 동s in first-seen order, floors lobby first, codes ascending.
+  static func floorRows(_ doors: [Door]) -> [[Door]] {
+    var dongs: [String] = []
+    for door in doors where !dongs.contains(door.dong) { dongs.append(door.dong) }
+    return dongs.flatMap { dong in
+      Dictionary(grouping: doors.filter { $0.dong == dong }, by: \.floor)
+        .sorted { $0.key < $1.key }
+        .map { $0.value.sorted { $0.ho < $1.ho } }
+    }
+  }
+
   /// "101동 로비층 1~2라인" -> "로비층 1~2라인"
   var shortName: String {
     let trimmed = name.replacingOccurrences(of: #"^\s*\d+동\s*"#, with: "", options: .regularExpression)

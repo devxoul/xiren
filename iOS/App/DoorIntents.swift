@@ -39,28 +39,8 @@ struct OpenDoorIntent: AppIntent {
   }
 }
 
-struct OpenPrimaryDoorIntent: AppIntent {
-  static let title: LocalizedStringResource = "Open Primary Door"
-  static let description = IntentDescription("Opens your primary 공동현관 entrance.")
-
-  func perform() async throws -> some IntentResult & ProvidesDialog {
-    let doors = Preferences.allDoors
-    guard let target = doors.first(where: { $0.id == Preferences.primaryDoorID }) ?? doors.first else {
-      throw EzvilleError.invalidDoor
-    }
-    let message = try await EzvilleClient.shared.openDoor(target, dryRun: Preferences.dryRun)
-    return .result(dialog: "\(target.shortName): \(message)")
-  }
-}
-
 struct XirenShortcuts: AppShortcutsProvider {
   static var appShortcuts: [AppShortcut] {
-    AppShortcut(
-      intent: OpenPrimaryDoorIntent(),
-      phrases: ["Open the door with \(.applicationName)", "\(.applicationName) open door"],
-      shortTitle: "Open Primary Door",
-      systemImageName: "door.left.hand.open"
-    )
     AppShortcut(
       intent: OpenDoorIntent(),
       phrases: ["Open an entrance with \(.applicationName)"],

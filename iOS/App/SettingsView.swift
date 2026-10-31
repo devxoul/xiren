@@ -15,15 +15,7 @@ struct SettingsView: View {
           Text("When on, tapping a door only shows the request that would be sent. Turn off to actually open doors.")
         }
 
-        Section("Primary Entrance") {
-          Picker("Primary", selection: Binding(
-            get: { model.primaryDoor?.id ?? "" },
-            set: { id in if let door = model.doors.first(where: { $0.id == id }) { model.setPrimary(door) } }
-          )) {
-            ForEach(model.doors) { Text($0.name).tag($0.id) }
-          }
-          .pickerStyle(.inline)
-          .labelsHidden()
+        Section {
           Button("Reload Entrances") { Task { await model.refreshDoors() } }
             .disabled(model.isRefreshing)
         }
@@ -46,7 +38,7 @@ struct SettingsView: View {
         }
 
         Section {
-          Text("Use the Shortcuts app, Siri, or the Action Button with “Open Primary Door” for one-press access.")
+          Text("Use the Shortcuts app, Siri, or the Action Button with “Open Entrance” for one-press access.")
             .font(.footnote)
             .foregroundStyle(.secondary)
         }
