@@ -16,7 +16,6 @@ final class AppModel {
   private(set) var email: String? = Keychain.loadCredentials()?.email
   private var panelDoors: [Door] = Preferences.doors
   private(set) var customDoors: [Door] = Preferences.customDoors
-  private(set) var primaryDoorID: String? = Preferences.primaryDoorID
   private(set) var states: [Door.ID: DoorState] = [:]
   private(set) var isRefreshing = false
   var errorMessage: String?
@@ -44,14 +43,6 @@ final class AppModel {
   func removeCustomDoor(_ door: Door) {
     customDoors.removeAll { $0.id == door.id }
     Preferences.customDoors = customDoors
-  }
-
-  var primaryDoor: Door? {
-    doors.first { $0.id == primaryDoorID } ?? doors.first
-  }
-
-  var otherDoors: [Door] {
-    doors.filter { $0.id != primaryDoor?.id }
   }
 
   func state(for door: Door) -> DoorState {
@@ -84,7 +75,6 @@ final class AppModel {
     email = nil
     panelDoors = []
     customDoors = []
-    primaryDoorID = nil
     states = [:]
   }
 
@@ -111,11 +101,6 @@ final class AppModel {
     } catch {
       errorMessage = error.localizedDescription
     }
-  }
-
-  func setPrimary(_ door: Door) {
-    primaryDoorID = door.id
-    Preferences.primaryDoorID = door.id
   }
 
   func open(_ door: Door) async {

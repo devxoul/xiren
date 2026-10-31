@@ -59,11 +59,6 @@ enum Preferences {
     return panel + custom.filter { !ids.contains($0.id) }
   }
 
-  static var primaryDoorID: String? {
-    get { defaults.string(forKey: "primaryDoorID") }
-    set { defaults.set(newValue, forKey: "primaryDoorID") }
-  }
-
   /// Defaults to ON: control requests are described but not sent until turned off in Settings.
   static var dryRun: Bool {
     get { defaults.object(forKey: "dryRun") as? Bool ?? true }

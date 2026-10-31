@@ -18,19 +18,12 @@ struct DoorsView: View {
               .background(.orange.opacity(0.12), in: .rect(cornerRadius: 12))
           }
 
-          if let primary = model.primaryDoor {
-            DoorButton(title: model.title(for: primary), state: model.state(for: primary), prominent: true) {
-              Task { await model.open(primary) }
-            }
-          }
-
-          LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
-            ForEach(model.otherDoors) { door in
-              DoorButton(title: model.title(for: door), state: model.state(for: door), prominent: false) {
-                Task { await model.open(door) }
-              }
-              .contextMenu {
-                Button("Make Primary", systemImage: "star") { model.setPrimary(door) }
+          ForEach(Door.floorRows(model.doors), id: \.first?.id) { row in
+            HStack(spacing: 12) {
+              ForEach(row) { door in
+                DoorButton(title: model.title(for: door), state: model.state(for: door)) {
+                  Task { await model.open(door) }
+                }
               }
             }
           }
@@ -69,22 +62,15 @@ struct DoorsView: View {
 struct DoorButton: View {
   let title: String
   let state: DoorState
-  let prominent: Bool
   let action: () -> Void
 
   var body: some View {
     Button(action: action) {
-      VStack(alignment: .leading, spacing: prominent ? 12 : 8) {
-        HStack {
-          icon
-          Spacer()
-          if prominent {
-            Image(systemName: "star.fill").font(.caption).opacity(0.7)
-          }
-        }
+      VStack(alignment: .leading, spacing: 8) {
+        icon
         Spacer(minLength: 0)
         Text(title)
-          .font(prominent ? .title2.bold() : .headline)
+          .font(.headline)
           .multilineTextAlignment(.leading)
           .lineLimit(2)
           .minimumScaleFactor(0.8)
@@ -93,11 +79,11 @@ struct DoorButton: View {
           .lineLimit(2)
           .opacity(0.8)
       }
-      .frame(maxWidth: .infinity, minHeight: prominent ? 180 : 120, alignment: .leading)
-      .padding(prominent ? 20 : 14)
+      .frame(maxWidth: .infinity, minHeight: 120, alignment: .leading)
+      .padding(14)
       .foregroundStyle(foreground)
-      .background(background, in: .rect(cornerRadius: prominent ? 28 : 20))
-      .contentShape(.rect(cornerRadius: prominent ? 28 : 20))
+      .background(background, in: .rect(cornerRadius: 20))
+      .contentShape(.rect(cornerRadius: 20))
     }
     .buttonStyle(PressableStyle())
     .disabled(state == .opening)
@@ -115,9 +101,9 @@ struct DoorButton: View {
   @ViewBuilder private var icon: some View {
     switch state {
     case .opening: ProgressView().tint(foreground)
-    case .success: Image(systemName: "door.left.hand.open").font(prominent ? .title : .title3)
-    case .failure: Image(systemName: "exclamationmark.triangle.fill").font(prominent ? .title : .title3)
-    case .idle: Image(systemName: "door.left.hand.closed").font(prominent ? .title : .title3)
+    case .success: Image(systemName: "door.left.hand.open").font(.title3)
+    case .failure: Image(systemName: "exclamationmark.triangle.fill").font(.title3)
+    case .idle: Image(systemName: "door.left.hand.closed").font(.title3)
     }
   }
 
@@ -134,14 +120,14 @@ struct DoorButton: View {
     switch state {
     case .success: .green
     case .failure: .red
-    case .idle, .opening: prominent ? .accentColor : Color(.secondarySystemGroupedBackground)
+    case .idle, .opening: Color(.secondarySystemGroupedBackground)
     }
   }
 
   private var foreground: Color {
     switch state {
     case .success, .failure: .white
-    case .idle, .opening: prominent ? .white : .primary
+    case .idle, .opening: .primary
     }
   }
 }
