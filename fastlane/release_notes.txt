@@ -1,5 +1,9 @@
-First TestFlight build.
+Entrances are now laid out by floor. Settings lets you show or hide each one, and add entrances of other 동s by hand.
 
-Sign in with the ezVille account for your apartment, pick your 공동현관 doors in Settings, then tap one to open it. Siri and Shortcuts open the primary door.
+Forgot your password? Set a new one with the code shown on your wall pad, right from the sign-in screen.
 
-Dry Run is on by default: the request is only described, never sent. Turn it off in Settings when you want a door to actually open.
+The app now speaks Korean as well as English, following your device language.
+
+There is no primary entrance anymore: Siri and Shortcuts now ask which entrance to open.
+
+Dry Run is still on by default. Turn it off in Settings when you want a door to actually open.
