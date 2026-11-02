@@ -60,6 +60,9 @@ actor EzvilleClient {
     guard EzvilleParser.isTruthy(json["result"]) else {
       throw EzvilleError.loginFailed(json["msg"] as? String ?? String(localized: "Login failed."))
     }
+    // The web app lands on the home page after login, and the 조명/난방/대기전력스위치 panels answer
+    // HTTP 500 until it has been loaded in the session.
+    _ = try await get("/app/index.ifttt")
     loggedIn = true
   }
 
