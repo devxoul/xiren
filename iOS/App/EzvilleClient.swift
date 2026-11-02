@@ -81,6 +81,44 @@ actor EzvilleClient {
     return try await control(path, query: [("mode", "1"), ("dong", door.dong), ("ho", door.ho)])
   }
 
+  // MARK: - Visitors and recordings (read-only)
+
+  private static let downloadMoviePath = "/app/ctrl/downloadMovie.ifttt"
+
+  func fetchMedia(_ kind: MediaKind, page: Int) async throws -> MediaPage {
+    for _ in 0..<2 {
+      try await ensureLoggedIn()
+      _ = try await get("/app/ctrl/individualctrl.ifttt", query: [("DEVICE_TYPE", kind.panelType)])
+      if let result = EzvilleParser.mediaPage(try await get(kind.listPath, query: [("current_page", String(page))]), kind: kind) {
+        return result
+      }
+      loggedIn = false // non-JSON body means the session expired
+    }
+    throw EzvilleError.unexpectedResponse
+  }
+
+  func imageData(_ image: MediaItem.Image) async throws -> Data {
+    switch image {
+    case .inline(let data):
+      return data
+    case .remote(let url):
+      return try await send(URLRequest(url: url))
+    case .proxied(let filename):
+      try await ensureLoggedIn()
+      return try await get(Self.downloadMoviePath, query: [("mode", "thumb"), ("filename", filename)])
+    }
+  }
+
+  /// Downloads a recording to a temporary file, since AVPlayer can't send the session cookie itself.
+  func movieFile(_ filename: String) async throws -> URL {
+    try await ensureLoggedIn()
+    let data = try await get(Self.downloadMoviePath, query: [("mode", "movie"), ("filename", filename)])
+    guard !data.isEmpty else { throw EzvilleError.unexpectedResponse }
+    let file = FileManager.default.temporaryDirectory.appendingPathComponent("recording.mp4")
+    try data.write(to: file, options: .atomic)
+    return file
+  }
+
   // MARK: - Password reset (월패드 인증)
 
   private static let findPasswordPath = "/app/mypage/myPage_findPassword.ifttt"

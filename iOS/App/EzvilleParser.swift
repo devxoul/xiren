@@ -50,6 +50,63 @@ struct PasswordResetForm: Sendable {
   }
 }
 
+/// The two read-only media lists: 방문자 (door camera photos) and 방범영상 (recorded clips).
+enum MediaKind: String, CaseIterable, Identifiable, Sendable {
+  case visitors
+  case recordings
+
+  var id: Self { self }
+
+  /// The list endpoints answer HTTP 500 until their panel has been opened in the session.
+  var panelType: String {
+    switch self {
+    case .visitors: "방문자"
+    case .recordings: "CCTV"
+    }
+  }
+
+  var listPath: String {
+    switch self {
+    case .visitors: "/app/ctrl/getVisitorList.ifttt"
+    case .recordings: "/app/ctrl/getCCTVList.ifttt"
+    }
+  }
+}
+
+/// One entry of `getVisitorList` / `getCCTVList`.
+struct MediaItem: Hashable, Identifiable, Sendable {
+  enum Image: Hashable, Sendable {
+    /// JPEG bytes sent inline (`link == "base64"`).
+    case inline(Data)
+    /// An absolute image URL.
+    case remote(URL)
+    /// Fetched through `downloadMovie.ifttt?mode=thumb&filename=…`.
+    case proxied(String)
+  }
+
+  let filename: String
+  let location: String
+  let image: Image?
+  /// `filename` for `downloadMovie.ifttt?mode=movie`; nil for photos.
+  let movie: String?
+
+  var id: String { "\(location)/\(filename)" }
+
+  /// The filename starts with the capture time, `yyyyMMddHHmmss`, in Korean time.
+  var date: Date? {
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
+    formatter.dateFormat = "yyyyMMddHHmmss"
+    return formatter.date(from: String(filename.prefix(14)))
+  }
+}
+
+struct MediaPage: Sendable, Equatable {
+  let items: [MediaItem]
+  let totalPages: Int
+}
+
 struct ControlResult: Sendable, Equatable {
   let ok: Bool
   let message: String?
@@ -185,6 +242,36 @@ enum EzvilleParser {
     return ControlResult(ok: isTruthy(json["result"]), message: json["msg"] as? String)
   }
 
+  /// Parses a `getVisitorList` / `getCCTVList` page. `result: false` means an empty list (its `msg` says
+  /// so); nil means the body is not that JSON, usually a login page after the session expired.
+  static func mediaPage(_ data: Data, kind: MediaKind) -> MediaPage? {
+    guard let json = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
+        json.keys.contains("result") else { return nil }
+    guard isTruthy(json["result"]) else { return MediaPage(items: [], totalPages: 0) }
+    let list = json["ctrlList"] as? [[String: Any]] ?? []
+    let items = list.compactMap { entry -> MediaItem? in
+      let string = { (key: String) in (entry[key] as? String) ?? "" }
+      let filename = string("filename")
+      guard !filename.isEmpty else { return nil }
+      let data = string("data")
+      let image: MediaItem.Image?
+      let content = string("content")
+      // Mirrors the panels' renderers: inline base64, else visitors show `data` as an image URL and
+      // recordings pass `content` to `downloadMovie` for both the thumbnail and the clip.
+      if string("link") == "base64" {
+        image = Data(base64Encoded: data, options: .ignoreUnknownCharacters).map(MediaItem.Image.inline)
+      } else if kind == .recordings {
+        image = content.isEmpty ? nil : .proxied(content)
+      } else {
+        image = URL(string: data).map(MediaItem.Image.remote)
+      }
+      let movie = kind == .recordings && !content.isEmpty ? content : nil
+      return MediaItem(filename: filename, location: string("location"), image: image, movie: movie)
+    }
+    let totalPages = (json["totalPage"] as? NSNumber)?.intValue ?? Int(json["totalPage"] as? String ?? "") ?? 1
+    return MediaPage(items: items, totalPages: totalPages)
+  }
+
   static func isTruthy(_ value: Any?) -> Bool {
     switch value {
     case let b as Bool: return b
@@ -220,6 +307,7 @@ enum EzvilleError: LocalizedError {
   case invalidDoor
   case server(String)
   case unexpectedResponse
+  case unplayableVideo
 
   var errorDescription: String? {
     switch self {
@@ -231,6 +319,7 @@ enum EzvilleError: LocalizedError {
     case .invalidDoor: String(localized: "Not a lobby door code.")
     case .server(let msg): msg
     case .unexpectedResponse: String(localized: "Unexpected response from server.")
+    case .unplayableVideo: String(localized: "The video can't be played.")
     }
   }
 }

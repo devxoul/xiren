@@ -42,6 +42,35 @@ struct EzvilleParserTests {
     #expect(EzvilleParser.controlResult(Data("<html>login</html>".utf8)) == nil)
   }
 
+  @Test func mediaPageParsesVisitorPhotosAndRecordings() throws {
+    let photo = Data("jpeg".utf8).base64EncodedString()
+    let visitors = Data("""
+    {"result":true,"curPage":1,"totalPage":4,"ctrlList":[
+      {"seq":"1","filename":"20261029213206.jpg","location":"door","link":"base64","data":"\(photo)","content":""},
+      {"seq":"2","filename":"","link":"base64","data":""}
+    ]}
+    """.utf8)
+    let page = try #require(EzvilleParser.mediaPage(visitors, kind: .visitors))
+    #expect(page.totalPages == 4)
+    #expect(page.items == [MediaItem(filename: "20261029213206.jpg", location: "door", image: .inline(Data("jpeg".utf8)), movie: nil)])
+    #expect(page.items[0].date == Date(timeIntervalSince1970: 1_793_277_126)) // 2026-10-29 21:32:06 KST
+
+    let recordings = Data("""
+    {"result":true,"curPage":1,"totalPage":5,"hkey":"0000001","ctrlList":[
+      {"seq":"1","filename":"20261031165612.jpg","location":"mv_indoor","link":"url",
+       "data":"https://example.com/outdoor_20261031165612.mp4","content":"dGh1bWI="}
+    ]}
+    """.utf8)
+    #expect(EzvilleParser.mediaPage(recordings, kind: .recordings)?.items == [
+      MediaItem(filename: "20261031165612.jpg", location: "mv_indoor", image: .proxied("dGh1bWI="), movie: "dGh1bWI="),
+    ])
+  }
+
+  @Test func mediaPageTreatsFalseResultAsEmptyAndHtmlAsExpired() {
+    #expect(EzvilleParser.mediaPage(Data(#"{"result":false,"msg":"방문자 목록이 없습니다."}"#.utf8), kind: .visitors) == MediaPage(items: [], totalPages: 0))
+    #expect(EzvilleParser.mediaPage(Data("<html>login</html>".utf8), kind: .recordings) == nil)
+  }
+
   @Test func inputValueReadsHiddenFields() {
     let html = #"<input type="hidden" id="seq" name="seq" value="42" /><input type="hidden" id="act" name="act" value="auth">"#
     #expect(EzvilleParser.inputValue(id: "seq", in: html) == "42")
