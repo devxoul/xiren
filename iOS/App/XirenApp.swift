@@ -9,7 +9,10 @@ struct XirenApp: App {
     WindowGroup {
       Group {
         if model.isSignedIn {
-          DoorsView()
+          TabView {
+            Tab("Entrances", systemImage: "door.left.hand.closed") { DoorsView() }
+            Tab("CCTV", systemImage: "video") { MediaView() }
+          }
         } else {
           LoginView()
         }
