@@ -9,7 +9,7 @@ struct SettingsView: View {
     NavigationStack {
       Form {
         Section {
-          ForEach(model.doors) { door in
+          ForEach(Door.floorRows(model.doors).flatMap { $0 }) { door in
             Toggle(model.title(for: door), isOn: Binding(
               get: { !model.isHidden(door) },
               set: { model.setHidden(door, !$0) }
