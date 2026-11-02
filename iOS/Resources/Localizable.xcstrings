@@ -1,6 +1,26 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "%@°C, now %@°C": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@°C, 현재 %2$@°C"
+          }
+        }
+      }
+    },
+    "%lld°C": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld°C"
+          }
+        }
+      }
+    },
     "8-20 characters using 3 of uppercase, lowercase, digits and symbols, or 10+ characters using 2 of them.": {
       "localizations": {
         "ko": {
@@ -57,6 +77,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "다른 동의 공동현관처럼 목록에 없는 출입문을 추가합니다. 우리 동이 아닌 출입문은 서버가 거부할 수 있습니다."
+          }
+        }
+      }
+    },
+    "Apply": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "적용"
+          }
+        }
+      }
+    },
+    "Away, now %@°C": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "외출, 현재 %@°C"
           }
         }
       }
@@ -127,6 +167,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "새 비밀번호 확인"
+          }
+        }
+      }
+    },
+    "Controls": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "실내제어"
           }
         }
       }
@@ -241,6 +291,26 @@
         }
       }
     },
+    "Heating": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "난방"
+          }
+        }
+      }
+    },
+    "Lights": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "조명"
+          }
+        }
+      }
+    },
     "List": {
       "localizations": {
         "ko": {
@@ -297,6 +367,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "새 비밀번호"
+          }
+        }
+      }
+    },
+    "No Devices": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "기기 없음"
           }
         }
       }
@@ -367,6 +447,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "확인"
+          }
+        }
+      }
+    },
+    "Off, now %@°C": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "꺼짐, 현재 %@°C"
           }
         }
       }
@@ -541,6 +631,16 @@
         }
       }
     },
+    "Standby Power": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "대기전력"
+          }
+        }
+      }
+    },
     "Tap to open": {
       "localizations": {
         "ko": {
@@ -677,6 +777,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "ezVille(S&D 스마트홈) 계정입니다. 이 기기의 키체인에만 저장됩니다."
+          }
+        }
+      }
+    },
+    "Zones that are off can only be turned on at the wall pad.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "꺼진 구역은 월패드에서만 켤 수 있습니다."
           }
         }
       }

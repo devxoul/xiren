@@ -11,6 +11,7 @@ struct XirenApp: App {
         if model.isSignedIn {
           TabView {
             Tab("Entrances", systemImage: "door.left.hand.closed") { DoorsView() }
+            Tab("Controls", systemImage: "lightbulb") { ControlsView() }
             Tab("CCTV", systemImage: "video") { MediaView() }
           }
         } else {

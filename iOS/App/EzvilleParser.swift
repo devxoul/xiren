@@ -107,6 +107,51 @@ struct MediaPage: Sendable, Equatable {
   let totalPages: Int
 }
 
+/// On/off devices controlled the same way: 조명 and 대기전력스위치.
+enum SwitchKind: String, CaseIterable, Sendable {
+  case light
+  case standby
+
+  var panelType: String {
+    switch self {
+    case .light: "조명"
+    case .standby: "대기전력스위치"
+    }
+  }
+
+  var controlPath: String {
+    switch self {
+    case .light: "/app/ctrl/individualctrlLight.ifttt"
+    case .standby: "/app/ctrl/individualctrlStandby.ifttt"
+    }
+  }
+}
+
+/// A light or standby-power outlet. `id` is `<home>_<dong>_<ho>_<kind>_<zone>_<index>`.
+struct SwitchDevice: Hashable, Identifiable, Sendable {
+  let kind: SwitchKind
+  let id: String
+  let zone: String
+  let isOn: Bool
+}
+
+/// A heating zone. The app can only set the target while it's on; off is changed on the wall pad.
+struct Thermostat: Hashable, Identifiable, Sendable {
+  enum Mode: Hashable, Sendable {
+    case off
+    case away
+    case heating
+  }
+
+  static let temperatureRange = 5...40
+
+  let id: String
+  let zone: String
+  let current: String
+  let target: String
+  let mode: Mode
+}
+
 struct ControlResult: Sendable, Equatable {
   let ok: Bool
   let message: String?
@@ -270,6 +315,43 @@ enum EzvilleParser {
     }
     let totalPages = (json["totalPage"] as? NSNumber)?.intValue ?? Int(json["totalPage"] as? String ?? "") ?? 1
     return MediaPage(items: items, totalPages: totalPages)
+  }
+
+  /// Reads the `zoneArray.push('…'); idArray.push('…'); …` blocks the control panels render, one
+  /// record per `zoneArray.push`. Records without an id are skipped, as is a repeated id.
+  static func panelRecords(in html: String) -> [[String: String]] {
+    guard let regex = try? NSRegularExpression(pattern: #"(\w+)Array\.push\(\s*'([^']*)'\s*\)"#) else { return [] }
+    let ns = html as NSString
+    var records: [[String: String]] = []
+    for match in regex.matches(in: html, range: NSRange(location: 0, length: ns.length)) {
+      let key = ns.substring(with: match.range(at: 1))
+      let value = ns.substring(with: match.range(at: 2))
+      if key == "zone" { records.append([:]) }
+      guard !records.isEmpty else { continue }
+      records[records.count - 1][key] = value
+    }
+    var seen = Set<String>()
+    return records.filter { record in
+      guard let id = record["id"], !id.isEmpty else { return false }
+      return seen.insert(id).inserted
+    }
+  }
+
+  static func switches(in html: String, kind: SwitchKind) -> [SwitchDevice] {
+    panelRecords(in: html).compactMap { record in
+      guard let id = record["id"], id.contains("_\(kind.rawValue)_") else { return nil }
+      return SwitchDevice(kind: kind, id: id, zone: record["zone"] ?? "", isOn: record["status"] == "on")
+    }
+  }
+
+  /// Mirrors `heatingResult`: power off wins, then mode 0 is 외출, anything else is heating.
+  static func thermostats(in html: String) -> [Thermostat] {
+    panelRecords(in: html).compactMap { record in
+      guard let id = record["id"], id.contains("_heating_") else { return nil }
+      let mode: Thermostat.Mode = record["power"] == "off" ? .off : record["mode"] == "0" ? .away : .heating
+      return Thermostat(id: id, zone: record["zone"] ?? "", current: record["currentTemp"] ?? "",
+                        target: record["setTemp"] ?? "", mode: mode)
+    }
   }
 
   static func isTruthy(_ value: Any?) -> Bool {
