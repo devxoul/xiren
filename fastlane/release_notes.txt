@@ -1,9 +1,9 @@
-Entrances are now laid out by floor. Settings lets you show or hide each one, and add entrances of other 동s by hand.
+Dry Run is gone: tapping a door, the Open Entrance shortcut and password reset now always act for real.
 
-Forgot your password? Set a new one with the code shown on your wall pad, right from the sign-in screen.
+New Controls tab: switch lights and standby power on or off, and set the target temperature of zones that are heating.
 
-The app now speaks Korean as well as English, following your device language.
+New CCTV tab: browse visitor photos and recorded clips. Tap a photo to see it full screen, or a clip to play it.
 
-There is no primary entrance anymore: Siri and Shortcuts now ask which entrance to open.
+Settings now lists entrances in the same floor order as the door screen.
 
-Dry Run is still on by default. Turn it off in Settings when you want a door to actually open.
+Sign-in uses the newer password encryption. Check that you can still log in.
