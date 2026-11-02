@@ -71,6 +71,41 @@ struct EzvilleParserTests {
     #expect(EzvilleParser.mediaPage(Data("<html>login</html>".utf8), kind: .recordings) == nil)
   }
 
+  @Test func switchesAreParsedFromControlPanels() {
+    // The panel renders a summary block without ids first, then the device block.
+    let html = """
+    zoneArray.push('거실'); statusArray.push('off');
+    zoneArray.push('거실');
+    idArray.push('0000001_101_101_light_1_1');
+    statusArray.push('on');
+    zoneArray.push('안방');
+    idArray.push('0000001_101_101_light_2_1');
+    statusArray.push('off');
+    zoneArray.push('안방'); idArray.push('0000001_101_101_light_2_1'); statusArray.push('off');
+    """
+    #expect(EzvilleParser.switches(in: html, kind: .light) == [
+      SwitchDevice(kind: .light, id: "0000001_101_101_light_1_1", zone: "거실", isOn: true),
+      SwitchDevice(kind: .light, id: "0000001_101_101_light_2_1", zone: "안방", isOn: false),
+    ])
+    #expect(EzvilleParser.switches(in: html, kind: .standby).isEmpty)
+  }
+
+  @Test func thermostatsFollowPowerThenMode() {
+    let html = """
+    zoneArray.push('거실'); idArray.push('0000001_101_101_heating_1_0'); currentTempArray.push('25.0');
+    setTempArray.push('24.0'); modeArray.push('1'); powerArray.push('on');
+    zoneArray.push('안방'); idArray.push('0000001_101_101_heating_2_0'); currentTempArray.push('23.0');
+    setTempArray.push('5.0'); modeArray.push('0'); powerArray.push('on');
+    zoneArray.push('침실1'); idArray.push('0000001_101_101_heating_3_0'); currentTempArray.push('22.0');
+    setTempArray.push('20.0'); modeArray.push('1'); powerArray.push('off');
+    """
+    #expect(EzvilleParser.thermostats(in: html) == [
+      Thermostat(id: "0000001_101_101_heating_1_0", zone: "거실", current: "25.0", target: "24.0", mode: .heating),
+      Thermostat(id: "0000001_101_101_heating_2_0", zone: "안방", current: "23.0", target: "5.0", mode: .away),
+      Thermostat(id: "0000001_101_101_heating_3_0", zone: "침실1", current: "22.0", target: "20.0", mode: .off),
+    ])
+  }
+
   @Test func inputValueReadsHiddenFields() {
     let html = #"<input type="hidden" id="seq" name="seq" value="42" /><input type="hidden" id="act" name="act" value="auth">"#
     #expect(EzvilleParser.inputValue(id: "seq", in: html) == "42")

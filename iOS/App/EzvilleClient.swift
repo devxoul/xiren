@@ -81,6 +81,49 @@ actor EzvilleClient {
     return try await control(path, query: [("mode", "1"), ("dong", door.dong), ("ho", door.ho)])
   }
 
+  // MARK: - Indoor controls
+
+  private static let panelPath = "/app/ctrl/individualctrl.ifttt"
+
+  func fetchSwitches(_ kind: SwitchKind) async throws -> [SwitchDevice] {
+    try await fetchPanel(kind.panelType) { EzvilleParser.switches(in: $0, kind: kind) }
+  }
+
+  func fetchThermostats() async throws -> [Thermostat] {
+    try await fetchPanel("난방") { EzvilleParser.thermostats(in: $0) }
+  }
+
+  /// Turns a light or standby outlet on or off.
+  func setSwitch(_ device: SwitchDevice, on: Bool) async throws -> String {
+    guard device.id.contains("_\(device.kind.rawValue)_") else { throw EzvilleError.unexpectedResponse }
+    var query = [("id", device.id), ("power", on ? "on" : "off")]
+    if device.kind == .standby { query.append(("state", "0")) }
+    return try await control(device.kind.controlPath, query: query)
+  }
+
+  /// Sets a heating zone's target, as the panel's 온도적용 button does (`btnHeat()`, mode 1).
+  func setTemperature(_ thermostat: Thermostat, to temperature: Int) async throws -> String {
+    guard thermostat.id.contains("_heating_"), thermostat.mode != .off,
+        Thermostat.temperatureRange.contains(temperature) else { throw EzvilleError.unexpectedResponse }
+    let path = "/app/ctrl/individualctrlHeating.ifttt"
+    let query = [
+      ("id", thermostat.id), ("power", "on"), ("mode", "1"),
+      ("curtemp", thermostat.current), ("settemp", "\(temperature).0"), ("_t", "0"),
+    ]
+    return try await control(path, query: query)
+  }
+
+  private func fetchPanel<T>(_ deviceType: String, parse: (String) -> [T]) async throws -> [T] {
+    for _ in 0..<2 {
+      try await ensureLoggedIn()
+      let html = String(decoding: try await get(Self.panelPath, query: [("DEVICE_TYPE", deviceType)]), as: UTF8.self)
+      let items = parse(html)
+      if !items.isEmpty || !html.contains("loginView") { return items }
+      loggedIn = false // bounced to the login page; retry once with a fresh session
+    }
+    return []
+  }
+
   // MARK: - Visitors and recordings (read-only)
 
   private static let downloadMoviePath = "/app/ctrl/downloadMovie.ifttt"
