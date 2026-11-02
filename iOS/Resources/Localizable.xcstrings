@@ -131,6 +131,16 @@
         }
       }
     },
+    "Couldn't encrypt the password.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "비밀번호를 암호화하지 못했습니다."
+          }
+        }
+      }
+    },
     "Couldn't send a code. Check the building, unit and email.": {
       "localizations": {
         "ko": {
@@ -387,16 +397,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "비밀번호"
-          }
-        }
-      }
-    },
-    "Password is longer than the login checkstring.": {
-      "localizations": {
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "비밀번호가 로그인 checkstring보다 깁니다."
           }
         }
       }

@@ -3,12 +3,14 @@ import Testing
 @testable import Xiren
 
 struct EzvilleParserTests {
-  @Test func encodePasswordXorsAndZeroPads() throws {
-    #expect(try EzvilleParser.encodePassword("ab", checkstring: "AAAA") == "20234141")
+  // Expected value from crypto-js 4.2 with the same salt.
+  @Test func encodePasswordMatchesCryptoJSAES() throws {
+    let encoded = try EzvilleParser.encodePassword("p@ss한글", checkstring: "AbC123xYz", salt: Array(0..<8))
+    #expect(encoded == "U2FsdGVkX18AAQIDBAUGB+2LTjAPIz2V2oj1PfGzmJo=")
   }
 
-  @Test func encodePasswordRejectsPasswordLongerThanCheckstring() {
-    #expect(throws: EzvilleError.self) { try EzvilleParser.encodePassword("abcde", checkstring: "abc") }
+  @Test func encodePasswordUsesFreshSalt() throws {
+    #expect(try EzvilleParser.encodePassword("pw", checkstring: "c") != EzvilleParser.encodePassword("pw", checkstring: "c"))
   }
 
   @Test func checkstringIsFoundInEitherAttributeOrder() {

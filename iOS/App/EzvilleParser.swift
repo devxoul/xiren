@@ -1,3 +1,5 @@
+import CommonCrypto
+import CryptoKit
 import Foundation
 
 struct Door: Codable, Hashable, Identifiable, Sendable {
@@ -54,15 +56,31 @@ struct ControlResult: Sendable, Equatable {
 }
 
 enum EzvilleParser {
-  /// Port of `pwEncode` from `/asset/js/common.js`: byte-wise XOR of the password with the
-  /// per-session `checkstring`, padded with 0 past the password's end, upper-case hex.
-  static func encodePassword(_ password: String, checkstring: String) throws -> String {
-    let p = Array(password.utf16)
-    let c = Array(checkstring.utf16)
-    guard !c.isEmpty, p.count <= c.count else { throw EzvilleError.passwordTooLong }
-    return c.indices.map { i in
-      String(format: "%02X", (i < p.count ? p[i] : 0) ^ c[i])
-    }.joined()
+  /// Port of the login page's `pwEncode` (sent with `password_crypto=2`):
+  /// `CryptoJS.AES.encrypt(password, checkstring).toString()`, i.e. OpenSSL-style
+  /// base64("Salted__" + salt + AES-256-CBC ciphertext), key and IV from EVP_BytesToKey(MD5).
+  static func encodePassword(
+    _ password: String, checkstring: String,
+    salt: [UInt8] = (0..<8).map { _ in UInt8.random(in: .min ... .max) }
+  ) throws -> String {
+    let passphrase = Array(checkstring.utf8)
+    var derived: [UInt8] = []
+    var block: [UInt8] = []
+    while derived.count < 48 {
+      block = Array(Insecure.MD5.hash(data: block + passphrase + salt))
+      derived += block
+    }
+    let key = Array(derived[0..<32])
+    let iv = Array(derived[32..<48])
+    let plain = Array(password.utf8)
+    var cipher = [UInt8](repeating: 0, count: plain.count + kCCBlockSizeAES128)
+    var length = 0
+    let status = CCCrypt(
+      CCOperation(kCCEncrypt), CCAlgorithm(kCCAlgorithmAES), CCOptions(kCCOptionPKCS7Padding),
+      key, key.count, iv, plain, plain.count, &cipher, cipher.count, &length
+    )
+    guard status == kCCSuccess else { throw EzvilleError.passwordEncryptionFailed }
+    return Data(Array("Salted__".utf8) + salt + cipher[0..<length]).base64EncodedString()
   }
 
   static func checkstring(in html: String) -> String? {
@@ -196,7 +214,7 @@ enum EzvilleParser {
 enum EzvilleError: LocalizedError {
   case missingCredentials
   case checkstringNotFound
-  case passwordTooLong
+  case passwordEncryptionFailed
   case loginFailed(String)
   case http(Int)
   case invalidDoor
@@ -207,7 +225,7 @@ enum EzvilleError: LocalizedError {
     switch self {
     case .missingCredentials: String(localized: "Not signed in.")
     case .checkstringNotFound: String(localized: "Login page changed (checkstring not found).")
-    case .passwordTooLong: String(localized: "Password is longer than the login checkstring.")
+    case .passwordEncryptionFailed: String(localized: "Couldn't encrypt the password.")
     case .loginFailed(let msg): msg
     case .http(let code): String(localized: "Server error (HTTP \(code)).")
     case .invalidDoor: String(localized: "Not a lobby door code.")
