@@ -52,7 +52,7 @@ actor EzvilleClient {
       ("mode", "0"), ("version", Self.appVersion), ("userid", email), ("passwd", ""),
       ("autologinYN", "N"), ("devicekind", "android"), ("provisionYN", "null"),
       ("deviceToken", encoded), ("accessToken", ""), ("captchaText", ""),
-      ("password_crypto", "0"), ("checkstring", checkstring),
+      ("password_crypto", "2"), ("checkstring", checkstring),
     ])
     guard let json = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else {
       throw EzvilleError.unexpectedResponse
