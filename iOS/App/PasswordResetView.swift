@@ -12,7 +12,6 @@ struct PasswordResetView: View {
   @State private var step = Step.request
   @State private var confirmation = ""
   @State private var isWorking = false
-  @State private var note: String?
   @State private var error: String?
 
   init(email: String, onReset: @escaping (_ email: String, _ password: String) -> Void) {
@@ -21,15 +20,8 @@ struct PasswordResetView: View {
   }
 
   var body: some View {
-    @Bindable var model = model
     NavigationStack {
       Form {
-        Section {
-          Toggle("Dry Run", isOn: $model.dryRun)
-        } footer: {
-          Text("When on, nothing is sent: each step only shows the request it would make.")
-        }
-
         Section {
           TextField("Building (동)", text: $form.dong)
             .keyboardType(.numberPad)
@@ -65,10 +57,6 @@ struct PasswordResetView: View {
           } footer: {
             Text("8-20 characters using 3 of uppercase, lowercase, digits and symbols, or 10+ characters using 2 of them.")
           }
-        }
-
-        if let note {
-          Section { Text(note).font(.footnote.monospaced()).foregroundStyle(.secondary) }
         }
 
         if let error {
@@ -119,10 +107,10 @@ struct PasswordResetView: View {
     do {
       switch step {
       case .request:
-        note = try await model.sendPasswordResetCode(form)
+        try await model.sendPasswordResetCode(form)
         step = .verify
       case .verify:
-        note = try await model.verifyPasswordResetCode(form)
+        try await model.verifyPasswordResetCode(form)
         step = .newPassword
       case .newPassword:
         guard form.newPassword == confirmation else {
@@ -133,8 +121,7 @@ struct PasswordResetView: View {
           error = String(localized: "The password doesn't meet the rules below.")
           return
         }
-        note = try await model.resetPassword(form)
-        guard note == nil else { return } // dry run: nothing changed
+        try await model.resetPassword(form)
         onReset(form.email.trimmingCharacters(in: .whitespacesAndNewlines), form.newPassword)
         dismiss()
       }

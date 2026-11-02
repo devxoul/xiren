@@ -65,12 +65,6 @@ enum Preferences {
     return panel + custom.filter { !ids.contains($0.id) }
   }
 
-  /// Defaults to ON: control requests are described but not sent until turned off in Settings.
-  static var dryRun: Bool {
-    get { defaults.object(forKey: "dryRun") as? Bool ?? true }
-    set { defaults.set(newValue, forKey: "dryRun") }
-  }
-
   static func reset() {
     for key in ["doors", "customDoors", "hiddenDoorIDs", "primaryDoorID"] { defaults.removeObject(forKey: key) }
   }

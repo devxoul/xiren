@@ -12,7 +12,7 @@ EXTERNAL_TESTER_GROUP = "Beta Testers"
 BETA_APP_DESCRIPTION = <<~TEXT.strip
   Xiren opens the 공동현관 doors of an ezVille (S&D 스마트홈) apartment in one tap.
 
-  To test, sign in with the ezVille account for your apartment, pick your doors in Settings, then tap one. Dry Run is on by default, so a request is only described until you turn it off.
+  To test, sign in with the ezVille account for your apartment, pick your doors in Settings, then tap one to open it.
 TEXT
 
 # Beta App Review contact. The email is also the testers' feedback address.
@@ -26,7 +26,7 @@ BETA_CONTACT = {
   notes: <<~TEXT.strip
     Xiren talks to the ezVille (S&D 스마트홈) home network. Its accounts are issued to the residents of a specific apartment complex and can't be shared, so no demo account is provided.
 
-    Without an account the app shows its sign-in screen, which is the expected first screen. Dry Run is also on by default, so even a signed-in tester only sees the request that would be sent; no door is opened.
+    Without an account the app shows its sign-in screen, which is the expected first screen.
   TEXT
 }.compact
 

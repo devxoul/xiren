@@ -6,15 +6,8 @@ struct SettingsView: View {
   @State private var showAddDoor = false
 
   var body: some View {
-    @Bindable var model = model
     NavigationStack {
       Form {
-        Section {
-          Toggle("Dry Run", isOn: $model.dryRun)
-        } footer: {
-          Text("When on, tapping a door only shows the request that would be sent. Turn off to actually open doors.")
-        }
-
         Section {
           ForEach(model.doors) { door in
             Toggle(model.title(for: door), isOn: Binding(
