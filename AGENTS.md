@@ -98,4 +98,4 @@ The bundle ID `app.xiren.ios` is already registered on the Developer portal.
 
 ## Safety
 
-Never send actuating requests (`openDoor.ifttt`, `individualctrl*.ifttt` with `power`/`settemp`/`state`, gas valve, elevator) while developing or testing. The app ships with Dry Run on; keep tests offline.
+Never send actuating requests (`openDoor.ifttt`, `individualctrl*.ifttt` with `power`/`settemp`/`state`, gas valve, elevator) while developing or testing. Tapping a door in the app opens it for real; keep tests offline.

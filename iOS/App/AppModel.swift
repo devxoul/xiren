@@ -20,9 +20,6 @@ final class AppModel {
   private(set) var states: [Door.ID: DoorState] = [:]
   private(set) var isRefreshing = false
   var errorMessage: String?
-  var dryRun: Bool = Preferences.dryRun {
-    didSet { Preferences.dryRun = dryRun }
-  }
 
   var isSignedIn: Bool { email != nil }
 
@@ -70,16 +67,16 @@ final class AppModel {
     await refreshDoors()
   }
 
-  func sendPasswordResetCode(_ form: PasswordResetForm) async throws -> String? {
-    try await client.sendPasswordResetCode(form, dryRun: dryRun)
+  func sendPasswordResetCode(_ form: PasswordResetForm) async throws {
+    try await client.sendPasswordResetCode(form)
   }
 
-  func verifyPasswordResetCode(_ form: PasswordResetForm) async throws -> String? {
-    try await client.verifyPasswordResetCode(form, dryRun: dryRun)
+  func verifyPasswordResetCode(_ form: PasswordResetForm) async throws {
+    try await client.verifyPasswordResetCode(form)
   }
 
-  func resetPassword(_ form: PasswordResetForm) async throws -> String? {
-    try await client.resetPassword(form, dryRun: dryRun)
+  func resetPassword(_ form: PasswordResetForm) async throws {
+    try await client.resetPassword(form)
   }
 
   func signOut() async {
@@ -122,7 +119,7 @@ final class AppModel {
     guard state(for: door) != .opening else { return }
     states[door.id] = .opening
     do {
-      states[door.id] = .success(try await client.openDoor(door, dryRun: dryRun))
+      states[door.id] = .success(try await client.openDoor(door))
     } catch {
       states[door.id] = .failure(error.localizedDescription)
     }

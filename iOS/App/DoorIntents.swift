@@ -34,7 +34,7 @@ struct OpenDoorIntent: AppIntent {
 
   func perform() async throws -> some IntentResult & ProvidesDialog {
     guard let target = Preferences.allDoors.first(where: { $0.id == door.id }) else { throw EzvilleError.invalidDoor }
-    let message = try await EzvilleClient.shared.openDoor(target, dryRun: Preferences.dryRun)
+    let message = try await EzvilleClient.shared.openDoor(target)
     return .result(dialog: "\(message)")
   }
 }

@@ -161,36 +161,6 @@
         }
       }
     },
-    "Dry Run": {
-      "localizations": {
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "테스트 모드"
-          }
-        }
-      }
-    },
-    "Dry run: GET %@?%@": {
-      "localizations": {
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "테스트 모드: GET %1$@?%2$@"
-          }
-        }
-      }
-    },
-    "Dry run: doors will not actually open": {
-      "localizations": {
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "테스트 모드: 문이 실제로 열리지 않습니다"
-          }
-        }
-      }
-    },
     "Email": {
       "localizations": {
         "ko": {
@@ -587,26 +557,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "인증번호 확인"
-          }
-        }
-      }
-    },
-    "When on, nothing is sent: each step only shows the request it would make.": {
-      "localizations": {
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "켜 두면 아무것도 보내지 않고, 단계마다 보낼 요청만 보여 줍니다."
-          }
-        }
-      }
-    },
-    "When on, tapping a door only shows the request that would be sent. Turn off to actually open doors.": {
-      "localizations": {
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "켜 두면 문을 탭해도 보낼 요청만 보여 줍니다. 실제로 문을 열려면 끄세요."
           }
         }
       }

@@ -74,15 +74,11 @@ actor EzvilleClient {
     return []
   }
 
-  /// Opens a 공동현관 door. With `dryRun` the request is only described, never sent.
-  func openDoor(_ door: Door, dryRun: Bool) async throws -> String {
+  /// Opens a 공동현관 door.
+  func openDoor(_ door: Door) async throws -> String {
     guard EzvilleParser.isLobbyDoorCode(door.ho) else { throw EzvilleError.invalidDoor }
     let path = "/app/ctrl/openDoor.ifttt"
-    let query = [("mode", "1"), ("dong", door.dong), ("ho", door.ho)]
-    if dryRun {
-      return String(localized: "Dry run: GET \(makeURL(path, query: query).relativePath)?\(Self.encode(query))")
-    }
-    return try await control(path, query: query)
+    return try await control(path, query: [("mode", "1"), ("dong", door.dong), ("ho", door.ho)])
   }
 
   // MARK: - Password reset (월패드 인증)
@@ -90,29 +86,26 @@ actor EzvilleClient {
   private static let findPasswordPath = "/app/mypage/myPage_findPassword.ifttt"
 
   /// Asks the server to show a verification code on the household's wall pad. Starts a fresh
-  /// session that the next steps reuse. Returns the request description in dry run, nil once sent.
-  func sendPasswordResetCode(_ form: PasswordResetForm, dryRun: Bool) async throws -> String? {
-    let path = "/app/mypage/myPage_FindPassword_sendAuthNum.ifttt"
-    let query = form.query()
-    if dryRun { return Self.describe(path, query) }
+  /// session that the next steps reuse.
+  func sendPasswordResetCode(_ form: PasswordResetForm) async throws {
     loggedIn = false
     clearCookies()
     _ = try await get(Self.findPasswordPath)
-    try await expectResetCode(path, query, fallback: String(localized: "Couldn't send a code. Check the building, unit and email."))
-    return nil
+    try await expectResetCode(
+      "/app/mypage/myPage_FindPassword_sendAuthNum.ifttt", form.query(),
+      fallback: String(localized: "Couldn't send a code. Check the building, unit and email.")
+    )
   }
 
-  func verifyPasswordResetCode(_ form: PasswordResetForm, dryRun: Bool) async throws -> String? {
-    let path = "/app/mypage/myPage_FindPassword_checkAuthNum.ifttt"
-    let query = form.query()
-    if dryRun { return Self.describe(path, query) }
-    try await expectResetCode(path, query, fallback: String(localized: "Wrong or expired code."))
-    return nil
+  func verifyPasswordResetCode(_ form: PasswordResetForm) async throws {
+    try await expectResetCode(
+      "/app/mypage/myPage_FindPassword_checkAuthNum.ifttt", form.query(),
+      fallback: String(localized: "Wrong or expired code.")
+    )
   }
 
-  func resetPassword(_ form: PasswordResetForm, dryRun: Bool) async throws -> String? {
+  func resetPassword(_ form: PasswordResetForm) async throws {
     let path = "/app/mypage/myPage_FindPassword_PWSave.ifttt"
-    if dryRun { return Self.describe(path, form.query(includingPassword: true)) }
     // The web page reloads after verification; pick up the hidden fields it renders then.
     let html = String(decoding: try await get(Self.findPasswordPath), as: UTF8.self)
     let query = form.query(
@@ -124,7 +117,6 @@ actor EzvilleClient {
       throw EzvilleError.unexpectedResponse
     }
     guard result.ok else { throw EzvilleError.server(result.message ?? String(localized: "Couldn't change the password.")) }
-    return nil
   }
 
   private func expectResetCode(_ path: String, _ query: [(String, String)], fallback: String) async throws {
@@ -132,11 +124,6 @@ actor EzvilleClient {
       throw EzvilleError.unexpectedResponse
     }
     guard result.ok else { throw EzvilleError.server(result.message ?? fallback) }
-  }
-
-  private static func describe(_ path: String, _ query: [(String, String)]) -> String {
-    let masked = query.map { key, value in (key, key.hasPrefix("new_pwd") ? "***" : value) }
-    return String(localized: "Dry run: GET \(path)?\(encode(masked))")
   }
 
   private func control(_ path: String, query: [(String, String)]) async throws -> String {

@@ -5,19 +5,9 @@ struct DoorsView: View {
   @State private var showSettings = false
 
   var body: some View {
-    @Bindable var model = model
     NavigationStack {
       ScrollView {
         VStack(spacing: 12) {
-          if model.dryRun {
-            Label("Dry run: doors will not actually open", systemImage: "testtube.2")
-              .font(.footnote.weight(.medium))
-              .foregroundStyle(.orange)
-              .frame(maxWidth: .infinity)
-              .padding(10)
-              .background(.orange.opacity(0.12), in: .rect(cornerRadius: 12))
-          }
-
           ForEach(Door.floorRows(model.visibleDoors), id: \.first?.id) { row in
             HStack(spacing: 12) {
               ForEach(row) { door in
